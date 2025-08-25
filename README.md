@@ -10,59 +10,39 @@ Brazilian work day calculator with AI-enhanced holiday detection for accurate pl
 🏙️ **Multi-City Support** - Salvador, Rio de Janeiro, São Paulo, and Brazil Federal  
 🌐 **Real-Time Data** - Federal holidays from official BrasilAPI  
 
-## Project info
+## Getting Started
 
-**URL**: https://lovable.dev/projects/00909ef8-158c-451a-a901-3e1a3a13980c
+### Prerequisites
 
-## How can I edit this code?
+- Node.js 18+ 
+- npm or yarn package manager
 
-There are several ways of editing your application.
+### Installation
 
-**Use Lovable**
+1. **Clone the repository:**
+   ```bash
+   git clone <YOUR_GIT_URL>
+   cd my-city-calendar
+   ```
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/00909ef8-158c-451a-a901-3e1a3a13980c) and start prompting.
+2. **Install dependencies:**
+   ```bash
+   npm install
+   ```
 
-Changes made via Lovable will be committed automatically to this repo.
+3. **Set up environment variables (optional):**
+   ```bash
+   cp .env.example .env
+   # Edit .env and add your Gemini API key (see AI Setup section below)
+   ```
 
-**Use your preferred IDE**
+4. **Start the development server:**
+   ```bash
+   npm run dev
+   ```
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Set up AI holiday enhancement (optional)
-cp .env.example .env
-# Edit .env and add your Gemini API key (see AI Setup section below)
-
-# Step 5: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
-
-**Edit a file directly in GitHub**
-
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
-
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+5. **Open your browser:**
+   Visit `http://localhost:5173` to see the application running.
 
 ## AI Holiday Enhancement Setup
 
@@ -125,14 +105,113 @@ This project is built with:
 - **State Management**: React hooks with intelligent caching
 - **Date Handling**: date-fns with Brazilian Portuguese locale
 
-## How can I deploy this project?
+## Deployment
 
-Simply open [Lovable](https://lovable.dev/projects/00909ef8-158c-451a-a901-3e1a3a13980c) and click on Share -> Publish.
+This project can be deployed to various platforms. Here are the most popular options:
 
-## Can I connect a custom domain to my Lovable project?
+### 🚀 **Vercel (Recommended)**
 
-Yes, you can!
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone)
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+1. **One-click deployment:**
+   - Click the "Deploy with Vercel" button above
+   - Connect your GitHub account
+   - Configure environment variables (if using AI features)
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+2. **Manual deployment:**
+   ```bash
+   npm install -g vercel
+   vercel login
+   vercel --prod
+   ```
+
+3. **Environment Variables:**
+   - Go to Vercel Dashboard → Project → Settings → Environment Variables
+   - Add: `VITE_GEMINI_API_KEY=your_api_key_here`
+
+### 🔥 **Netlify**
+
+1. **Build and deploy:**
+   ```bash
+   npm run build
+   npx netlify-cli deploy --prod --dir=dist
+   ```
+
+2. **From GitHub:**
+   - Connect your GitHub repo to Netlify
+   - Build command: `npm run build`
+   - Publish directory: `dist`
+   - Environment variables: Add `VITE_GEMINI_API_KEY` in Site settings
+
+### 📄 **GitHub Pages**
+
+1. **Install gh-pages:**
+   ```bash
+   npm install --save-dev gh-pages
+   ```
+
+2. **Add to package.json:**
+   ```json
+   {
+     "homepage": "https://yourusername.github.io/my-city-calendar",
+     "scripts": {
+       "predeploy": "npm run build",
+       "deploy": "gh-pages -d dist"
+     }
+   }
+   ```
+
+3. **Deploy:**
+   ```bash
+   npm run deploy
+   ```
+
+### ☁️ **Other Platforms**
+
+- **Railway**: `railway login && railway up`
+- **Firebase Hosting**: `firebase deploy`
+- **Render**: Connect GitHub repo with build command `npm run build`
+- **Surge**: `npm install -g surge && surge dist/`
+
+### 🔧 **Build Configuration**
+
+For production builds:
+```bash
+npm run build
+```
+
+The built files will be in the `dist/` directory.
+
+### 🌍 **Environment Variables**
+
+For platforms that support environment variables, add:
+- `VITE_GEMINI_API_KEY`: Your Google Gemini API key (optional)
+
+**Note**: All `VITE_` prefixed variables are exposed to the client-side code.
+
+## Available Scripts
+
+- `npm run dev` - Start development server
+- `npm run build` - Build for production  
+- `npm run build:dev` - Build in development mode
+- `npm run lint` - Run ESLint
+- `npm run preview` - Preview production build locally
+
+## Contributing
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## License
+
+This project is open source and available under the [MIT License](LICENSE).
+
+## Support
+
+If you encounter any issues or have questions:
+- Open an issue on GitHub
+- Check the console for debugging information
+- Ensure your Gemini API key is properly configured for AI features
