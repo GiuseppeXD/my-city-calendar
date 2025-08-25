@@ -4,6 +4,10 @@ export interface Holiday {
   type: 'national' | 'state' | 'city';
 }
 
+export interface HolidayWithDate extends Holiday {
+  dateObject: Date;
+}
+
 export interface BrasilAPIHoliday {
   date: string;
   name: string;

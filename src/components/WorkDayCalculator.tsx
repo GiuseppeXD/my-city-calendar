@@ -6,7 +6,8 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { CalendarDays, Clock, MapPin, Calculator } from 'lucide-react';
 import { format, getDaysInMonth, eachDayOfInterval, startOfMonth, endOfMonth, isWeekend, isSameDay } from 'date-fns';
-import { getCityHolidays } from '@/lib/holidays';
+import { getCityHolidays, getCityHolidaysWithNames } from '@/lib/holidays';
+import { HolidayWithDate } from '@/lib/api';
 import { MONTHS, DAY_NAMES } from '@/lib/constants';
 
 interface WorkDayCalculatorProps {
@@ -28,6 +29,7 @@ const WorkDayCalculator: React.FC<WorkDayCalculatorProps> = ({
 }) => {
   const [hoursPerDay, setHoursPerDay] = useState<number>(8);
   const [holidays, setHolidays] = useState<Date[]>([]);
+  const [holidaysWithNames, setHolidaysWithNames] = useState<HolidayWithDate[]>([]);
   const [isLoadingHolidays, setIsLoadingHolidays] = useState<boolean>(false);
 
   const currentYear = new Date().getFullYear();
@@ -38,11 +40,16 @@ const WorkDayCalculator: React.FC<WorkDayCalculatorProps> = ({
     const fetchHolidays = async () => {
       setIsLoadingHolidays(true);
       try {
-        const cityHolidays = await getCityHolidays(selectedCity, selectedYear);
+        const [cityHolidays, cityHolidaysWithNames] = await Promise.all([
+          getCityHolidays(selectedCity, selectedYear),
+          getCityHolidaysWithNames(selectedCity, selectedYear)
+        ]);
         setHolidays(cityHolidays);
+        setHolidaysWithNames(cityHolidaysWithNames);
       } catch (error) {
         console.error('Error fetching holidays:', error);
         setHolidays([]); // Fallback to empty array
+        setHolidaysWithNames([]);
       } finally {
         setIsLoadingHolidays(false);
       }
@@ -79,11 +86,11 @@ const WorkDayCalculator: React.FC<WorkDayCalculatorProps> = ({
       weekendDays,
       holidayDays,
       totalWorkHours: workDays * hoursPerDay,
-      holidays: holidays.filter(holiday => 
-        holiday.getMonth() === selectedMonth && holiday.getFullYear() === selectedYear
+      holidays: holidaysWithNames.filter(holiday => 
+        holiday.dateObject.getMonth() === selectedMonth && holiday.dateObject.getFullYear() === selectedYear
       ),
     };
-  }, [selectedMonth, selectedYear, hoursPerDay, holidays]);
+  }, [selectedMonth, selectedYear, hoursPerDay, holidaysWithNames]);
 
   return (
     <div className="space-y-6">
@@ -137,7 +144,7 @@ const WorkDayCalculator: React.FC<WorkDayCalculatorProps> = ({
 
             {/* City Selector */}
             <div className="space-y-2">
-              <Label htmlFor="city" className="flex items-center gap-1">
+              <Label htmlFor="city" className="flex items-center gap-1 h-6">
                 <MapPin className="h-3 w-3" />
                 Cidade
               </Label>
@@ -231,11 +238,19 @@ const WorkDayCalculator: React.FC<WorkDayCalculatorProps> = ({
           <CardContent>
             <div className="space-y-2">
               {workDayStats.holidays.map((holiday, index) => (
-                <div key={index} className="flex items-center justify-between p-2 rounded-md bg-holiday/10">
-                  <span className="font-medium">{format(holiday, 'dd/MM/yyyy')}</span>
-                  <span className="text-sm text-muted-foreground">
-                    {DAY_NAMES[holiday.getDay()]}
-                  </span>
+                <div key={index} className="flex items-center justify-between p-3 rounded-md bg-holiday/10 border border-holiday/20">
+                  <div className="flex flex-col">
+                    <span className="font-medium">{format(holiday.dateObject, 'dd/MM/yyyy')}</span>
+                    <span className="text-sm font-semibold text-holiday">{holiday.name}</span>
+                  </div>
+                  <div className="text-right">
+                    <span className="text-sm text-muted-foreground">
+                      {DAY_NAMES[holiday.dateObject.getDay()]}
+                    </span>
+                    <div className="text-xs text-muted-foreground capitalize">
+                      {holiday.type === 'national' ? 'Federal' : holiday.type === 'city' ? 'Municipal' : 'Estadual'}
+                    </div>
+                  </div>
                 </div>
               ))}
             </div>
