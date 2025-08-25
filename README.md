@@ -1,4 +1,14 @@
-# Welcome to your Lovable project
+# Calculadora de Dias Úteis
+
+Brazilian work day calculator with AI-enhanced holiday detection for accurate planning across Brazilian cities.
+
+## Features
+
+🗓️ **Visual Calendar** - Color-coded calendar with work days, weekends, and holidays  
+🤖 **AI-Enhanced Holidays** - Real-time holiday discovery using Gemini AI  
+📊 **Work Day Statistics** - Calculate total work days and hours  
+🏙️ **Multi-City Support** - Salvador, Rio de Janeiro, São Paulo, and Brazil Federal  
+🌐 **Real-Time Data** - Federal holidays from official BrasilAPI  
 
 ## Project info
 
@@ -32,7 +42,11 @@ cd <YOUR_PROJECT_NAME>
 # Step 3: Install the necessary dependencies.
 npm i
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# Step 4: Set up AI holiday enhancement (optional)
+cp .env.example .env
+# Edit .env and add your Gemini API key (see AI Setup section below)
+
+# Step 5: Start the development server with auto-reloading and an instant preview.
 npm run dev
 ```
 
@@ -50,15 +64,66 @@ npm run dev
 - Click on "New codespace" to launch a new Codespace environment.
 - Edit files directly within the Codespace and commit and push your changes once you're done.
 
+## AI Holiday Enhancement Setup
+
+This application can use Google's Gemini AI to discover additional municipal holidays and facultative days that might not be in the hardcoded database.
+
+### 🤖 **Enable AI Holiday Discovery**
+
+1. **Get a Free Gemini API Key:**
+   - Visit [Google AI Studio](https://ai.google.dev/)
+   - Sign in with your Google account
+   - Click "Get API Key" and create a new key
+   - Copy your API key
+
+2. **Configure Environment Variables:**
+   ```bash
+   # Create environment file
+   cp .env.example .env
+   
+   # Edit .env and add your API key
+   VITE_GEMINI_API_KEY=your_actual_gemini_api_key_here
+   ```
+
+3. **Restart Development Server:**
+   ```bash
+   npm run dev
+   ```
+
+### 🎯 **How AI Enhancement Works**
+
+- **Without AI**: Shows federal holidays (BrasilAPI) + verified municipal holidays
+- **With AI**: Adds AI-discovered holidays like facultative days, regional celebrations, etc.
+- **Fallback**: If AI fails, falls back to verified holiday data
+- **Caching**: AI responses are cached to minimize API calls
+
+### 🏙️ **Supported Cities with AI Enhancement**
+
+- **Salvador, Bahia** - Municipal holidays + Bahia state holidays
+- **Rio de Janeiro, RJ** - Municipal holidays + RJ state holidays  
+- **São Paulo, SP** - Municipal holidays + SP state holidays
+- **Brazil Federal** - National holidays only (no AI enhancement needed)
+
+### 🔧 **Debugging AI Holidays**
+
+Open browser console to see AI enhancement logs:
+```
+[AI Enhancement] Enhancing holidays for salvador (Bahia) in 2024
+[AI Cache] Cache miss for salvador-bahia-brazil-2024, fetching from AI...
+[AI Enhancement] Got 3 AI holidays
+[AI Enhancement] Adding 1 new holidays from AI
+```
+
 ## What technologies are used for this project?
 
 This project is built with:
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+- **Frontend**: React 18 + TypeScript + Vite
+- **UI Components**: shadcn/ui + Radix UI primitives
+- **Styling**: Tailwind CSS with custom calendar theme
+- **APIs**: BrasilAPI (federal holidays) + Google Gemini AI (municipal holidays)
+- **State Management**: React hooks with intelligent caching
+- **Date Handling**: date-fns with Brazilian Portuguese locale
 
 ## How can I deploy this project?
 

@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { CalendarDays, Clock, MapPin, Calculator } from 'lucide-react';
 import { format, getDaysInMonth, eachDayOfInterval, startOfMonth, endOfMonth, isWeekend, isSameDay } from 'date-fns';
-import { getCityHolidays, getCityHolidaysWithNames } from '@/lib/holidays';
+import { getHolidays, getHolidayDates } from '@/lib/holidayService';
 import { HolidayWithDate } from '@/lib/api';
 import { MONTHS, DAY_NAMES } from '@/lib/constants';
 
@@ -40,10 +40,10 @@ const WorkDayCalculator: React.FC<WorkDayCalculatorProps> = ({
     const fetchHolidays = async () => {
       setIsLoadingHolidays(true);
       try {
-        const [cityHolidays, cityHolidaysWithNames] = await Promise.all([
-          getCityHolidays(selectedCity, selectedYear),
-          getCityHolidaysWithNames(selectedCity, selectedYear)
-        ]);
+        // Only call getHolidays once - it returns the full holiday objects
+        const cityHolidaysWithNames = await getHolidays(selectedCity, selectedYear);
+        const cityHolidays = cityHolidaysWithNames.map(h => h.dateObject);
+        
         setHolidays(cityHolidays);
         setHolidaysWithNames(cityHolidaysWithNames);
       } catch (error) {

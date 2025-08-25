@@ -1,4 +1,6 @@
 import { getCachedNationalHolidays, Holiday, HolidayWithDate } from './api';
+import { enhanceHolidaysWithAI } from './aiHolidays';
+import { parseHolidayDate } from './dateUtils';
 
 // Fallback Brazilian federal holidays (used when API fails)
 const getFallbackBrazilianHolidays = (year: number): HolidayWithDate[] => {
@@ -20,7 +22,7 @@ const getBrazilianHolidays = async (year: number): Promise<HolidayWithDate[]> =>
     const holidays = await getCachedNationalHolidays(year);
     return holidays.map(holiday => ({
       ...holiday,
-      dateObject: new Date(holiday.date)
+      dateObject: parseHolidayDate(holiday.date)
     }));
   } catch (error) {
     console.warn('Using fallback holidays due to API error:', error);
@@ -28,19 +30,29 @@ const getBrazilianHolidays = async (year: number): Promise<HolidayWithDate[]> =>
   }
 };
 
-// Salvador-specific holidays (includes federal + local)
+// Salvador-specific holidays (includes federal + local + AI enhanced)
 const getSalvadorHolidays = async (year: number): Promise<HolidayWithDate[]> => {
   const federalHolidays = await getBrazilianHolidays(year);
   const localHolidays: HolidayWithDate[] = [
-    { date: `${year}-01-06`, name: 'Epifania', type: 'city', dateObject: new Date(year, 0, 6) },
-    { date: `${year}-06-24`, name: 'São João', type: 'city', dateObject: new Date(year, 5, 24) },
-    { date: `${year}-06-29`, name: 'São Pedro', type: 'city', dateObject: new Date(year, 5, 29) },
+    // Official Salvador municipal holidays based on city government sources
+    { date: `${year}-06-24`, name: 'Dia de São João', type: 'city', dateObject: new Date(year, 5, 24) },
     { date: `${year}-07-02`, name: 'Independência da Bahia', type: 'city', dateObject: new Date(year, 6, 2) },
+    { date: `${year}-12-08`, name: 'Dia de Nossa Senhora da Conceição', type: 'city', dateObject: new Date(year, 11, 8) },
   ];
-  return [...federalHolidays, ...localHolidays];
+  
+  const baseHolidays = [...federalHolidays, ...localHolidays];
+  
+  // Try to enhance with AI if available
+  try {
+    const enhancedHolidays = await enhanceHolidaysWithAI(baseHolidays, 'Salvador', year);
+    return enhancedHolidays;
+  } catch (error) {
+    console.warn('AI enhancement failed for Salvador holidays, using base holidays:', error);
+    return baseHolidays;
+  }
 };
 
-// Rio de Janeiro-specific holidays (includes federal + local)
+// Rio de Janeiro-specific holidays (includes federal + local + AI enhanced)
 const getRioDeJaneiroHolidays = async (year: number): Promise<HolidayWithDate[]> => {
   const federalHolidays = await getBrazilianHolidays(year);
   const localHolidays: HolidayWithDate[] = [
@@ -48,17 +60,37 @@ const getRioDeJaneiroHolidays = async (year: number): Promise<HolidayWithDate[]>
     { date: `${year}-10-17`, name: 'Morte de Zumbi dos Palmares', type: 'city', dateObject: new Date(year, 9, 17) },
     { date: `${year}-11-20`, name: 'Dia da Consciência Negra', type: 'city', dateObject: new Date(year, 10, 20) },
   ];
-  return [...federalHolidays, ...localHolidays];
+  
+  const baseHolidays = [...federalHolidays, ...localHolidays];
+  
+  // Try to enhance with AI if available
+  try {
+    const enhancedHolidays = await enhanceHolidaysWithAI(baseHolidays, 'rio-de-janeiro', year);
+    return enhancedHolidays;
+  } catch (error) {
+    console.warn('AI enhancement failed for Rio de Janeiro holidays, using base holidays:', error);
+    return baseHolidays;
+  }
 };
 
-// São Paulo-specific holidays (includes federal + local)
+// São Paulo-specific holidays (includes federal + local + AI enhanced)
 const getSaoPauloHolidays = async (year: number): Promise<HolidayWithDate[]> => {
   const federalHolidays = await getBrazilianHolidays(year);
   const localHolidays: HolidayWithDate[] = [
     { date: `${year}-02-13`, name: 'Carnaval', type: 'city', dateObject: new Date(year, 1, 13) },
     { date: `${year}-09-09`, name: 'Revolução Constitucionalista', type: 'city', dateObject: new Date(year, 8, 9) },
   ];
-  return [...federalHolidays, ...localHolidays];
+  
+  const baseHolidays = [...federalHolidays, ...localHolidays];
+  
+  // Try to enhance with AI if available
+  try {
+    const enhancedHolidays = await enhanceHolidaysWithAI(baseHolidays, 'sao-paulo', year);
+    return enhancedHolidays;
+  } catch (error) {
+    console.warn('AI enhancement failed for São Paulo holidays, using base holidays:', error);
+    return baseHolidays;
+  }
 };
 
 // Main function to get holidays based on city (returns dates only for compatibility)
@@ -81,6 +113,8 @@ export const getCityHolidaysWithNames = async (city: string, year: number): Prom
     case 'brazil':
     case 'brasil':
     default:
+      // For Brazil federal, we could enhance with AI for state holidays
+      // but since it's "federal", we'll keep it as pure federal holidays
       return await getBrazilianHolidays(year);
   }
 };

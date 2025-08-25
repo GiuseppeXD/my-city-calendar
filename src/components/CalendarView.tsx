@@ -15,7 +15,7 @@ import {
   isSameDay 
 } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { getCityHolidays } from '@/lib/holidays';
+import { getHolidayDates } from '@/lib/holidayService';
 import { WEEK_DAYS } from '@/lib/constants';
 
 interface CalendarViewProps {
@@ -37,7 +37,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({
     const fetchHolidays = async () => {
       setIsLoadingHolidays(true);
       try {
-        const cityHolidays = await getCityHolidays(selectedCity, selectedYear);
+        const cityHolidays = await getHolidayDates(selectedCity, selectedYear);
         setHolidays(cityHolidays);
       } catch (error) {
         console.error('Error fetching holidays:', error);
