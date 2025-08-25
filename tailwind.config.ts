@@ -18,6 +18,15 @@ export default {
 			}
 		},
 		extend: {
+			backgroundImage: {
+				'gradient-primary': 'var(--gradient-primary)',
+				'gradient-card': 'var(--gradient-card)',
+				'gradient-hero': 'var(--gradient-hero)',
+			},
+			boxShadow: {
+				'card': 'var(--shadow-card)',
+				'elevated': 'var(--shadow-elevated)',
+			},
 			colors: {
 				border: 'hsl(var(--border))',
 				input: 'hsl(var(--input))',
@@ -51,6 +60,22 @@ export default {
 				card: {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))'
+				},
+				'work-day': {
+					DEFAULT: 'hsl(var(--work-day))',
+					foreground: 'hsl(var(--work-day-foreground))'
+				},
+				'holiday': {
+					DEFAULT: 'hsl(var(--holiday))',
+					foreground: 'hsl(var(--holiday-foreground))'
+				},
+				'weekend': {
+					DEFAULT: 'hsl(var(--weekend))',
+					foreground: 'hsl(var(--weekend-foreground))'
+				},
+				'today': {
+					DEFAULT: 'hsl(var(--today))',
+					foreground: 'hsl(var(--today-foreground))'
 				},
 				sidebar: {
 					DEFAULT: 'hsl(var(--sidebar-background))',
