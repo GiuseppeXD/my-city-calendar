@@ -6,30 +6,8 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { CalendarDays, Clock, MapPin, Calculator } from 'lucide-react';
 import { format, getDaysInMonth, eachDayOfInterval, startOfMonth, endOfMonth, isWeekend, isSameDay } from 'date-fns';
-
-// Brazilian federal holidays and Salvador-specific holidays
-const getBrazilianHolidays = (year: number) => {
-  return [
-    new Date(year, 0, 1),   // New Year's Day
-    new Date(year, 3, 21),  // Tiradentes
-    new Date(year, 4, 1),   // Labor Day
-    new Date(year, 8, 7),   // Independence Day
-    new Date(year, 9, 12),  // Our Lady of Aparecida
-    new Date(year, 10, 2),  // All Souls' Day
-    new Date(year, 10, 15), // Proclamation of the Republic
-    new Date(year, 11, 25), // Christmas Day
-  ];
-};
-
-const getSalvadorHolidays = (year: number) => {
-  return [
-    ...getBrazilianHolidays(year),
-    new Date(year, 0, 6),   // Epiphany
-    new Date(year, 5, 24),  // São João
-    new Date(year, 5, 29),  // São Pedro
-    new Date(year, 6, 2),   // Independence of Bahia
-  ];
-};
+import { getCityHolidays } from '@/lib/holidays';
+import { MONTHS, DAY_NAMES } from '@/lib/constants';
 
 interface WorkDayCalculatorProps {
   selectedMonth: number;
@@ -52,19 +30,13 @@ const WorkDayCalculator: React.FC<WorkDayCalculatorProps> = ({
 
   const currentYear = new Date().getFullYear();
   const years = Array.from({ length: 10 }, (_, i) => currentYear - 5 + i);
-  const months = [
-    'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
-    'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
-  ];
 
   const workDayStats = useMemo(() => {
     const monthStart = startOfMonth(new Date(selectedYear, selectedMonth));
     const monthEnd = endOfMonth(new Date(selectedYear, selectedMonth));
     const daysInMonth = eachDayOfInterval({ start: monthStart, end: monthEnd });
     
-    const holidays = selectedCity === 'salvador' 
-      ? getSalvadorHolidays(selectedYear)
-      : getBrazilianHolidays(selectedYear);
+    const holidays = getCityHolidays(selectedCity, selectedYear);
 
     let workDays = 0;
     let weekendDays = 0;
@@ -118,7 +90,7 @@ const WorkDayCalculator: React.FC<WorkDayCalculatorProps> = ({
                   <SelectValue placeholder="Selecione o mês" />
                 </SelectTrigger>
                 <SelectContent>
-                  {months.map((month, index) => (
+                  {MONTHS.map((month, index) => (
                     <SelectItem key={index} value={index.toString()}>
                       {month}
                     </SelectItem>
@@ -156,6 +128,8 @@ const WorkDayCalculator: React.FC<WorkDayCalculatorProps> = ({
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="salvador">Salvador, BA</SelectItem>
+                  <SelectItem value="rio-de-janeiro">Rio de Janeiro, RJ</SelectItem>
+                  <SelectItem value="sao-paulo">São Paulo, SP</SelectItem>
                   <SelectItem value="brazil">Brasil (Federal)</SelectItem>
                 </SelectContent>
               </Select>
@@ -233,7 +207,7 @@ const WorkDayCalculator: React.FC<WorkDayCalculatorProps> = ({
       {workDayStats.holidays.length > 0 && (
         <Card className="bg-gradient-card shadow-card">
           <CardHeader>
-            <CardTitle className="text-lg">Feriados em {months[selectedMonth]} {selectedYear}</CardTitle>
+            <CardTitle className="text-lg">Feriados em {MONTHS[selectedMonth]} {selectedYear}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-2">
@@ -241,7 +215,7 @@ const WorkDayCalculator: React.FC<WorkDayCalculatorProps> = ({
                 <div key={index} className="flex items-center justify-between p-2 rounded-md bg-holiday/10">
                   <span className="font-medium">{format(holiday, 'dd/MM/yyyy')}</span>
                   <span className="text-sm text-muted-foreground">
-                    {['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'][holiday.getDay()]}
+                    {DAY_NAMES[holiday.getDay()]}
                   </span>
                 </div>
               ))}

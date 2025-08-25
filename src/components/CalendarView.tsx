@@ -15,30 +15,8 @@ import {
   isSameDay 
 } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-
-// Brazilian federal holidays and Salvador-specific holidays
-const getBrazilianHolidays = (year: number) => {
-  return [
-    new Date(year, 0, 1),   // New Year's Day
-    new Date(year, 3, 21),  // Tiradentes
-    new Date(year, 4, 1),   // Labor Day
-    new Date(year, 8, 7),   // Independence Day
-    new Date(year, 9, 12),  // Our Lady of Aparecida
-    new Date(year, 10, 2),  // All Souls' Day
-    new Date(year, 10, 15), // Proclamation of the Republic
-    new Date(year, 11, 25), // Christmas Day
-  ];
-};
-
-const getSalvadorHolidays = (year: number) => {
-  return [
-    ...getBrazilianHolidays(year),
-    new Date(year, 0, 6),   // Epiphany
-    new Date(year, 5, 24),  // São João
-    new Date(year, 5, 29),  // São Pedro
-    new Date(year, 6, 2),   // Independence of Bahia
-  ];
-};
+import { getCityHolidays } from '@/lib/holidays';
+import { WEEK_DAYS } from '@/lib/constants';
 
 interface CalendarViewProps {
   selectedMonth: number;
@@ -58,9 +36,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({
     const calendarEnd = endOfWeek(monthEnd, { weekStartsOn: 0 });
     
     const days = eachDayOfInterval({ start: calendarStart, end: calendarEnd });
-    const holidays = selectedCity === 'salvador' 
-      ? getSalvadorHolidays(selectedYear)
-      : getBrazilianHolidays(selectedYear);
+    const holidays = getCityHolidays(selectedCity, selectedYear);
 
     return {
       days,
@@ -102,7 +78,6 @@ const CalendarView: React.FC<CalendarViewProps> = ({
     }
   };
 
-  const weekDays = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
 
   return (
     <Card className="bg-gradient-card shadow-elevated">
@@ -115,7 +90,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({
         {/* Calendar Grid */}
         <div className="grid grid-cols-7 gap-2">
           {/* Week day headers */}
-          {weekDays.map((day) => (
+          {WEEK_DAYS.map((day) => (
             <div
               key={day}
               className="h-10 flex items-center justify-center text-sm font-semibold text-muted-foreground bg-muted/50 rounded-md"
