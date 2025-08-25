@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -27,16 +27,34 @@ const WorkDayCalculator: React.FC<WorkDayCalculatorProps> = ({
   onCityChange,
 }) => {
   const [hoursPerDay, setHoursPerDay] = useState<number>(8);
+  const [holidays, setHolidays] = useState<Date[]>([]);
+  const [isLoadingHolidays, setIsLoadingHolidays] = useState<boolean>(false);
 
   const currentYear = new Date().getFullYear();
   const years = Array.from({ length: 10 }, (_, i) => currentYear - 5 + i);
+
+  // Fetch holidays when city or year changes
+  useEffect(() => {
+    const fetchHolidays = async () => {
+      setIsLoadingHolidays(true);
+      try {
+        const cityHolidays = await getCityHolidays(selectedCity, selectedYear);
+        setHolidays(cityHolidays);
+      } catch (error) {
+        console.error('Error fetching holidays:', error);
+        setHolidays([]); // Fallback to empty array
+      } finally {
+        setIsLoadingHolidays(false);
+      }
+    };
+
+    fetchHolidays();
+  }, [selectedCity, selectedYear]);
 
   const workDayStats = useMemo(() => {
     const monthStart = startOfMonth(new Date(selectedYear, selectedMonth));
     const monthEnd = endOfMonth(new Date(selectedYear, selectedMonth));
     const daysInMonth = eachDayOfInterval({ start: monthStart, end: monthEnd });
-    
-    const holidays = getCityHolidays(selectedCity, selectedYear);
 
     let workDays = 0;
     let weekendDays = 0;
@@ -65,7 +83,7 @@ const WorkDayCalculator: React.FC<WorkDayCalculatorProps> = ({
         holiday.getMonth() === selectedMonth && holiday.getFullYear() === selectedYear
       ),
     };
-  }, [selectedMonth, selectedYear, hoursPerDay, selectedCity]);
+  }, [selectedMonth, selectedYear, hoursPerDay, holidays]);
 
   return (
     <div className="space-y-6">
@@ -75,6 +93,7 @@ const WorkDayCalculator: React.FC<WorkDayCalculatorProps> = ({
           <CardTitle className="flex items-center gap-2">
             <Calculator className="h-5 w-5" />
             Calculadora de Dias Úteis
+            {isLoadingHolidays && <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>}
           </CardTitle>
           <CardDescription>
             Configure o mês, cidade e horas por dia para calcular seus dias úteis

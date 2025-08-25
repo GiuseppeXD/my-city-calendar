@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
@@ -29,6 +29,26 @@ const CalendarView: React.FC<CalendarViewProps> = ({
   selectedYear,
   selectedCity = 'salvador',
 }) => {
+  const [holidays, setHolidays] = useState<Date[]>([]);
+  const [isLoadingHolidays, setIsLoadingHolidays] = useState<boolean>(false);
+
+  // Fetch holidays when city or year changes
+  useEffect(() => {
+    const fetchHolidays = async () => {
+      setIsLoadingHolidays(true);
+      try {
+        const cityHolidays = await getCityHolidays(selectedCity, selectedYear);
+        setHolidays(cityHolidays);
+      } catch (error) {
+        console.error('Error fetching holidays:', error);
+        setHolidays([]); // Fallback to empty array
+      } finally {
+        setIsLoadingHolidays(false);
+      }
+    };
+
+    fetchHolidays();
+  }, [selectedCity, selectedYear]);
   const calendarData = useMemo(() => {
     const monthStart = startOfMonth(new Date(selectedYear, selectedMonth));
     const monthEnd = endOfMonth(new Date(selectedYear, selectedMonth));
@@ -36,7 +56,6 @@ const CalendarView: React.FC<CalendarViewProps> = ({
     const calendarEnd = endOfWeek(monthEnd, { weekStartsOn: 0 });
     
     const days = eachDayOfInterval({ start: calendarStart, end: calendarEnd });
-    const holidays = getCityHolidays(selectedCity, selectedYear);
 
     return {
       days,
@@ -44,7 +63,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({
       monthStart,
       monthEnd
     };
-  }, [selectedMonth, selectedYear, selectedCity]);
+  }, [selectedMonth, selectedYear, holidays]);
 
   const getDayType = (day: Date) => {
     const isCurrentMonth = isSameMonth(day, calendarData.monthStart);
@@ -82,8 +101,9 @@ const CalendarView: React.FC<CalendarViewProps> = ({
   return (
     <Card className="bg-gradient-card shadow-elevated">
       <CardHeader className="pb-4">
-        <CardTitle className="text-center text-2xl">
+        <CardTitle className="text-center text-2xl flex items-center justify-center gap-2">
           {format(new Date(selectedYear, selectedMonth), 'MMMM yyyy', { locale: ptBR })}
+          {isLoadingHolidays && <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>}
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
